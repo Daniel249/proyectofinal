@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Página Principal</title>
+    <style>
+        body {
+            background-color: #f0f0f0; /* Cambia el color de fondo según sea necesario */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333;
+            display: flex; /* Usa flexbox para alinear los elementos */
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        li {
+            /* No es necesario agregar estilos adicionales */
+        }
+
+        li a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+
+        li a:hover {
+            background-color: #111;
+        }
+
+        .left {
+            margin-right: auto; /* Mueve el primer elemento a la izquierda */
+        }
+
+        .right {
+            margin-left: 10px; /* Añade un pequeño espacio entre los elementos de la derecha */
+        }
+
+        h1 {
+            color: #333; /* Cambia el color del texto según sea necesario */
+            text-align: center;
+            margin-top: 60px; /* Ajusta el margen superior para dejar espacio a la barra de navegación */
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            margin-top: 60px; /* Deja espacio para la barra de navegación */
+        }
+
+        .events-container {
+            height: 80vh; /* Altura fija para el contenedor de eventos */
+            overflow-y: auto; /* Habilita la barra de desplazamiento vertical */
+            width: 60%; /* Ancho para los eventos */
+            padding: 20px;
+        }
+
+        .events {
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* Espacio entre cada evento */
+        }
+
+        .event {
+            display: flex;
+            align-items: center; /* Alinea verticalmente los elementos */
+            gap: 20px; /* Espacio entre la imagen y la información del evento */
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            transition: transform 0.3s ease; /* Transición al desplazar */
+            cursor: pointer; /* Cambia el cursor para indicar que es seleccionable */
+        }
+
+        .event:hover {
+            transform: translateY(-10px); /* Eleva ligeramente el evento al pasar el mouse */
+        }
+
+        .event img {
+            width: 100px; /* Ancho fijo para las imágenes */
+            height: 100px; /* Altura fija para las imágenes */
+            border-radius: 5px;
+            object-fit: cover; /* Escala la imagen para que llene el cuadro */
+        }
+
+        .details-container {
+            width: 35%; /* Ancho para el cuadro de detalles */
+            padding: 20px;
+            border-left: 1px solid #ccc; /* Separador entre eventos y detalles */
+        }
+
+        .details-container button {
+            background-color: #333;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px; /* Añade un margen superior para separar el botón del contenido */
+            display: block; /* Asegura que el botón ocupe todo el ancho disponible */
+            width: 100%;
+            font-size: 16px; /* Ajusta el tamaño de la fuente */
+        }
+
+        .details-container button:hover {
+            background-color: #111;
+        }
+
+        .details {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .details img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+
+        .create-event-form {
+            display: none; /* Inicialmente oculto */
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 20px;
+            padding-right: 30px; /* Ajuste de padding a la derecha */
+            border-radius: 10px;
+            position: fixed; /* Posiciona el formulario sobre la página */
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -25%);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-width: 90%; /* Asegura que el formulario no se salga de la pantalla */
+            max-height: 90%; /* Asegura que el formulario no se salga de la pantalla */
+            overflow-y: auto; /* Permite desplazamiento dentro del formulario si es necesario */
+        }
+
+        .form-field {
+            margin-bottom: 10px;
+        }
+
+        .form-field label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-field input, .form-field textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-field button {
+            background-color: #333;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .form-field button:hover {
+            background-color: #111;
+        }
+    </style>
+</head>
+<body>
+
+<ul>
+    <li class="left"><a class="active" href="/">Inicio</a></li>
+    {% if user %}
+        <li class="right"><a href="/perfil">{{ user.username }}</a></li>
+        <li class="right"><a class="create-event-btn" onclick="toggleForm()">Crear Evento</a></li>
+        <li class="right"><a href="/logout">Cerrar Sesión</a></li>
+    {% else %}
+        <li class="right"><a href="/register">Registrarse</a></li>
+        <li class="right"><a href="/login">Iniciar Sesión</a></li>
+    {% endif %}
+</ul>
+
+<h1>Bienvenido a Grouper!</h1>
+
+<div class="container">
+    <div class="events-container">
+        <!-- Sección de eventos -->
+        <div class="events">
+            {% for event in events %}
+            <div class="event" onclick="showDetails('{{ event[0] }}', '{{ event[1] }}', '{{ event[2] }}', '{{ event[3] }}','{{ event[4] }}','{{ event[5] }}','{{ event[6] }}','{{ event[7] }}')">
+                <img src="{{ event[2] }}" alt="{{ event[0] }}">
+                <div>
+                    <h2>{{ event[0] }}</h2>
+                    <p>{{ event[1] }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="details-container">
+        <!-- Cuadro de detalles del evento -->
+        <div class="details" id="eventDetails">
+            <img src="" alt="Event Image" id="detailImage">
+            <h2 id="detailTitle">Selecciona un evento</h2>
+            <p id="detailOrganizador">Los detalles del evento aparecerán aquí.</p>
+            <p id="detailDescription"></p>
+            <p id="detailFecha"></p>
+            <p id="detailDuracion"></p>
+            <p id="detailCiudad"></p>
+            <p id="detailDireccion"></p>
+            <button id="subscribeButton" onclick="toggleSubscription()">Suscribirse</button>
+            <input type="hidden" id="subscriptionStatus" value="{{ session.get('subscribed', 'false') }}">
+            <input type="hidden" id="asistir" value="{{ session.get('asistir', '[]') }}">
+        </div>
+    </div>
+</div>
+
+<div class="create-event-form" id="createEventForm" >
+    <h2>Crear Nuevo Evento</h2>
+    <form action="/create_event" method="POST">
+        <div class="form-field">
+            <label for="title">Título</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div class="form-field">
+            <label for="organizador">Organizador</label>
+            <input type="text" id="organizador" name="organizador" required>
+        </div>
+        <div class="form-field">
+            <label for="description">Descripción</label>
+            <textarea id="description" name="description" required></textarea>
+        </div>
+        <div class="form-field">
+            <label for="ciudad">Ciudad</label>
+            <textarea id="ciudad" name="ciudad" required></textarea>
+        </div>
+        <div class="form-field">
+            <label for="lugar">Lugar</label>
+            <textarea id="lugar" name="lugar" required></textarea>
+        </div>
+        <div class="form-field">
+            <label for="fecha">Fecha</label>
+            <textarea id="fecha" name="fecha" required></textarea>
+        </div>
+        <div class="form-field">
+            <label for="duracion">Duracion (horas)</label>
+            <input type="number" id="duracion" name="duracion" required>
+        </div>
+        <div class="form-field">
+            <label for="image">URL de la Imagen</label>
+            <input type="url" id="image" name="image" required>
+        </div>
+        <div class="form-field">
+            <button type="submit">Crear Evento</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    var subscribedEvents = JSON.parse(document.getElementById('asistir').value);
+    var currentEventTitle = "";
+    function toggleForm() {
+        var form = document.getElementById('createEventForm');
+        form.style.display = form.style.display === 'none' || form.style.display === '' ? 'block' : 'none';
+    }
+
+    function showDetails(title, organizador, image, descripcion, fecha, duracion, ciudad, direccion) {
+        document.getElementById('detailTitle').innerText = title;
+        document.getElementById('detailOrganizador').innerText = 'Organizador: ' + organizador;
+        document.getElementById('detailImage').src = image;
+        document.getElementById('detailDescription').innerText = 'Descripcion: ' + descripcion;
+        document.getElementById('detailFecha').innerText = 'Cuando: ' + fecha + ' por ' + duracion + ' horas';
+        //document.getElementById('detailDuracion').innerText = 'Duracion: '+ duracion + ' horas';
+        document.getElementById('detailCiudad').innerText = 'Donde: ' + ciudad + ' en ' + direccion;
+        //document.getElementById('detailDireccion').innerText = 'Direccion: ' ;
+        currentEventTitle = title;
+        //updateSubscriptionStatus();
+        // Send a request to check the subscription status
+        fetch('/check_subscription', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title: currentEventTitle })
+        })
+        .then(response => response.json())
+        .then(data => {
+            var subscribeButton = document.getElementById('subscribeButton');
+            if (data.status === 'subscribed') {
+                subscribeButton.innerText = 'Suscrito';
+            } else {
+                subscribeButton.innerText = 'Suscribirse';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function updateSubscriptionStatus() {
+        subscribedEvents = JSON.parse(document.getElementById('asistir').value);
+        //subscribedEvents = {{ asistir }}
+        var subscribeButton = document.getElementById('subscribeButton');
+        console.log(subscribedEvents)
+        var isSubscribed = subscribedEvents.includes(currentEventTitle);
+        console.log(subscribedEvents)
+        subscribeButton.innerText = isSubscribed ? 'Suscrito' : 'Suscribirse';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        updateSubscriptionStatus();
+    });
+
+    function toggleSubscription() {
+        var subscribeButton = document.getElementById('subscribeButton');
+        var subscriptionStatus = document.getElementById('subscriptionStatus');
+        
+        var url = subscribeButton.innerText === 'Suscribirse' ? '/subscribe' : '/unsubscribe';
+        var data = { title: currentEventTitle };
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.status === 'subscribed') {
+                subscribeButton.innerText = 'Suscrito';
+                subscriptionStatus.value = 'true';
+            } else {
+                subscribeButton.innerText = 'Suscribirse';
+                subscriptionStatus.value = 'false';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+</script>
+
+
+
+</body>
+</html>

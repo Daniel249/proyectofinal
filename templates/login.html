@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Iniciar Sesión</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center; /* Centra el título del formulario */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            text-align: left; /* Alinea las etiquetas a la izquierda */
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%; /* Asegura que el botón de envío ocupe todo el ancho disponible */
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #e0f7fa;
+            color: #00796b;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <form id="loginForm" method="POST" action="/login">
+        <h2>Iniciar Sesión</h2>
+        <label for="username">Nombre de usuario:</label>
+        <input type="text" id="username" name="username" required>
+        
+        <label for="password">Contraseña:</label>
+        <input type="password" id="password" name="password" required>
+        
+        <input type="submit" value="Iniciar Sesión">
+    </form>
+
+    <div id="message" class="message" style="display: none;"></div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            //event.preventDefault(); // Evita la recarga de la página
+
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: username, password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/';
+                } else {
+                    var messageDiv = document.getElementById('message');
+                    messageDiv.style.display = 'block';
+                    messageDiv.textContent = 'Nombre de usuario o contraseña incorrectos.';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
