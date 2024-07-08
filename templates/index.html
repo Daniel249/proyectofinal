@@ -1,361 +1,164 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Página Principal</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Habitaciones</title>
     <style>
         body {
-            background-color: #f0f0f0; /* Cambia el color de fondo según sea necesario */
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
         }
-
-        ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: #333;
-            display: flex; /* Usa flexbox para alinear los elementos */
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
-
-        li {
-            /* No es necesario agregar estilos adicionales */
-        }
-
-        li a {
-            display: block;
-            color: white;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-        }
-
-        li a:hover {
-            background-color: #111;
-        }
-
-        .left {
-            margin-right: auto; /* Mueve el primer elemento a la izquierda */
-        }
-
-        .right {
-            margin-left: 10px; /* Añade un pequeño espacio entre los elementos de la derecha */
-        }
-
         h1 {
-            color: #333; /* Cambia el color del texto según sea necesario */
             text-align: center;
-            margin-top: 60px; /* Ajusta el margen superior para dejar espacio a la barra de navegación */
         }
-
         .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .room-list {
             display: flex;
-            justify-content: space-between;
-            padding: 20px;
-            margin-top: 60px; /* Deja espacio para la barra de navegación */
+            flex-wrap: wrap;
+            gap: 10px;
         }
-
-        .events-container {
-            height: 80vh; /* Altura fija para el contenedor de eventos */
-            overflow-y: auto; /* Habilita la barra de desplazamiento vertical */
-            width: 60%; /* Ancho para los eventos */
+        .room-item {
+            flex: 1 1 calc(33.333% - 10px);
             padding: 20px;
-        }
-
-        .events {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #fff;
+            cursor: pointer;
             display: flex;
             flex-direction: column;
-            gap: 20px; /* Espacio entre cada evento */
+            align-items: center;
         }
-
-        .event {
-            display: flex;
-            align-items: center; /* Alinea verticalmente los elementos */
-            gap: 20px; /* Espacio entre la imagen y la información del evento */
-            border: 1px solid #ccc;
-            padding: 20px;
-            border-radius: 10px;
-            transition: transform 0.3s ease; /* Transición al desplazar */
-            cursor: pointer; /* Cambia el cursor para indicar que es seleccionable */
-        }
-
-        .event:hover {
-            transform: translateY(-10px); /* Eleva ligeramente el evento al pasar el mouse */
-        }
-
-        .event img {
-            width: 100px; /* Ancho fijo para las imágenes */
-            height: 100px; /* Altura fija para las imágenes */
-            border-radius: 5px;
-            object-fit: cover; /* Escala la imagen para que llene el cuadro */
-        }
-
-        .details-container {
-            width: 35%; /* Ancho para el cuadro de detalles */
-            padding: 20px;
-            border-left: 1px solid #ccc; /* Separador entre eventos y detalles */
-        }
-
-        .details-container button {
-            background-color: #333;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px; /* Añade un margen superior para separar el botón del contenido */
-            display: block; /* Asegura que el botón ocupe todo el ancho disponible */
-            width: 100%;
-            font-size: 16px; /* Ajusta el tamaño de la fuente */
-        }
-
-        .details-container button:hover {
-            background-color: #111;
-        }
-
-        .details {
-            border: 1px solid #ccc;
-            padding: 20px;
-            border-radius: 10px;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .details img {
-            width: 100%;
-            border-radius: 10px;
-            margin-bottom: 20px;
+        .room-item img {
+            width: 100px;
+            height: 100px;
             object-fit: cover;
-        }
-
-        .create-event-form {
-            display: none; /* Inicialmente oculto */
-            background-color: #fff;
-            border: 1px solid #ccc;
-            padding: 20px;
-            padding-right: 30px; /* Ajuste de padding a la derecha */
-            border-radius: 10px;
-            position: fixed; /* Posiciona el formulario sobre la página */
-            top: 20%;
-            left: 50%;
-            transform: translate(-50%, -25%);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            max-width: 90%; /* Asegura que el formulario no se salga de la pantalla */
-            max-height: 90%; /* Asegura que el formulario no se salga de la pantalla */
-            overflow-y: auto; /* Permite desplazamiento dentro del formulario si es necesario */
-        }
-
-        .form-field {
             margin-bottom: 10px;
         }
-
-        .form-field label {
-            display: block;
-            margin-bottom: 5px;
+        .room-item.selected {
+            background-color: lightblue;
         }
-
-        .form-field input, .form-field textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        #reservation-form {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
         }
-
-        .form-field button {
-            background-color: #333;
-            color: white;
-            padding: 10px 15px;
+        button {
+            padding: 10px 20px;
             border: none;
             border-radius: 5px;
+            background-color: #007bff;
+            color: white;
             cursor: pointer;
         }
-
-        .form-field button:hover {
-            background-color: #111;
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-
-<ul>
-    <li class="left"><a class="active" href="/">Inicio</a></li>
-    {% if user %}
-        <li class="right"><a href="#">{{ user.username }}</a></li>
-        <li class="right"><a class="create-event-btn" onclick="toggleForm()">Crear Evento</a></li>
-        <li class="right"><a href="/logout">Cerrar Sesión</a></li>
-    {% else %}
-        <li class="right"><a href="/register">Registrarse</a></li>
-        <li class="right"><a href="/login">Iniciar Sesión</a></li>
-    {% endif %}
-</ul>
-
-<h1>Bienvenido a Grouper!</h1>
-
-<div class="container">
-    <div class="events-container">
-        <!-- Sección de eventos -->
-        <div class="events">
-            {% for event in events %}
-            <div class="event" onclick="showDetails('{{ event[0] }}', '{{ event[1] }}', '{{ event[2] }}', '{{ event[3] }}','{{ event[4] }}','{{ event[5] }}','{{ event[6] }}','{{ event[7] }}')">
-                <img src="{{ event[2] }}" alt="{{ event[0] }}">
-                <div>
-                    <h2>{{ event[0] }}</h2>
-                    <p>{{ event[1] }}</p>
+    <h1>Reserve sus habitaciones</h1>
+    <div class="container">
+        <div class="room-list" id="room-list">
+            {% for room in rooms %}
+                <div class="room-item" data-room-id="{{ room[0] }}">
+                    <p>ID: {{ room[0] }}</p>
+                    {% if room[1] == 'Simple' %}
+                        <img src="https://d3ahbhsao0me9i.cloudfront.net/cache/img/28e2dc504bbc602a52f991aa650cbf53d95c66a0-28e2dc-1980-1024-auto.jpg" alt="Habitación Simple">
+                    {% elif room[1] == 'Doble' %}
+                        <img src="https://www.zaanhotel.com/images/rooms/deluxe-double/gallery/Double%206.jpg" alt="Habitación Doble">
+                    {% elif room[2] == 2 %}
+                        <img src="https://previews.123rf.com/images/rilueda/rilueda1701/rilueda170100289/70732373-interior-de-un-nuevo-dormitorio-cama-doble-hotel-en-el-%C3%A1tico.jpg" alt="Habitación Doble con 2 Camas">
+                    {% elif room[2] == 3 %}
+                        <img src="https://media-cdn.tripadvisor.com/media/photo-s/0f/03/3c/9d/habitacion-triple-3-camas.jpg" alt="Habitación Triple">
+                    {% elif room[2] == 4 %}
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_J8zqWyg_LealhdCbHn4zlEPV6VkI7jvO8g&s" alt="Habitación Cuádruple">
+                    {% endif %}
+                    <h2>Tipo: {{ room[1] }}</h2>
+                    <p>Cantidad de camas: {{ room[2] }}</p>
                 </div>
-            </div>
             {% endfor %}
         </div>
-    </div>
+        <button id="open-form-btn">Reservar</button>
 
-    <div class="details-container">
-        <!-- Cuadro de detalles del evento -->
-        <div class="details" id="eventDetails">
-            <img src="" alt="Event Image" id="detailImage">
-            <h2 id="detailTitle">Selecciona un evento</h2>
-            <p id="detailOrganizador">Los detalles del evento aparecerán aquí.</p>
-            <p id="detailDescription"></p>
-            <p id="detailFecha"></p>
-            <p id="detailDuracion"></p>
-            <p id="detailCiudad"></p>
-            <p id="detailDireccion"></p>
-            <button id="subscribeButton" onclick="toggleSubscription()">Suscribirse</button>
-            <input type="hidden" id="subscriptionStatus" value="{{ session.get('subscribed', 'false') }}">
-            <input type="hidden" id="asistir" value="{{ session.get('asistir', '[]') }}">
+        <!-- Formulario de reserva -->
+        <div id="reservation-form">
+            <h2>Formulario de Reserva</h2>
+            <form id="form">
+                <label for="name">Nombre:</label>
+                <input type="text" id="name" name="name" required><br><br>
+                <label for="last_name">Apellido:</label>
+                <input type="text" id="last_name" name="last_name" required><br><br>
+                <label for="identification">Número de Identificación:</label>
+                <input type="text" id="identification" name="identification" required><br><br>
+                <label for="phone_number">Número de Teléfono:</label>
+                <input type="tel" id="phone_number" name="phone_number" required><br><br>
+                <button type="button" id="submit-btn">Enviar</button>
+            </form>
         </div>
     </div>
-</div>
 
-<div class="create-event-form" id="createEventForm" >
-    <h2>Crear Nuevo Evento</h2>
-    <form action="/create_event" method="POST">
-        <div class="form-field">
-            <label for="title">Título</label>
-            <input type="text" id="title" name="title" required>
-        </div>
-        <div class="form-field">
-            <label for="organizador">Organizador</label>
-            <input type="text" id="organizador" name="organizador" required>
-        </div>
-        <div class="form-field">
-            <label for="description">Descripción</label>
-            <textarea id="description" name="description" required></textarea>
-        </div>
-        <div class="form-field">
-            <label for="ciudad">Ciudad</label>
-            <textarea id="ciudad" name="ciudad" required></textarea>
-        </div>
-        <div class="form-field">
-            <label for="lugar">Lugar</label>
-            <textarea id="lugar" name="lugar" required></textarea>
-        </div>
-        <div class="form-field">
-            <label for="fecha">Fecha</label>
-            <textarea id="fecha" name="fecha" required></textarea>
-        </div>
-        <div class="form-field">
-            <label for="duracion">Duracion (horas)</label>
-            <input type="number" id="duracion" name="duracion" required>
-        </div>
-        <div class="form-field">
-            <label for="image">URL de la Imagen</label>
-            <input type="url" id="image" name="image" required>
-        </div>
-        <div class="form-field">
-            <button type="submit">Crear Evento</button>
-        </div>
-    </form>
-</div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const roomList = document.getElementById('room-list');
+            const selectedRooms = new Set();
 
-<script>
-    var subscribedEvents = JSON.parse(document.getElementById('asistir').value);
-    var currentEventTitle = "";
-    function toggleForm() {
-        var form = document.getElementById('createEventForm');
-        form.style.display = form.style.display === 'none' || form.style.display === '' ? 'block' : 'none';
-    }
+            roomList.addEventListener('click', (e) => {
+                const roomItem = e.target.closest('.room-item');
+                if (roomItem) {
+                    const roomId = roomItem.getAttribute('data-room-id');
+                    if (selectedRooms.has(roomId)) {
+                        selectedRooms.delete(roomId);
+                        roomItem.classList.remove('selected');
+                    } else {
+                        selectedRooms.add(roomId);
+                        roomItem.classList.add('selected');
+                    }
+                }
+            });
 
-    function showDetails(title, organizador, image, descripcion, fecha, duracion, ciudad, direccion) {
-        document.getElementById('detailTitle').innerText = title;
-        document.getElementById('detailOrganizador').innerText = 'Organizador: ' + organizador;
-        document.getElementById('detailImage').src = image;
-        document.getElementById('detailDescription').innerText = 'Descripcion: ' + descripcion;
-        document.getElementById('detailFecha').innerText = 'Cuando: ' + fecha + ' por ' + duracion + ' horas';
-        //document.getElementById('detailDuracion').innerText = 'Duracion: '+ duracion + ' horas';
-        document.getElementById('detailCiudad').innerText = 'Donde: ' + ciudad + ' en ' + direccion;
-        //document.getElementById('detailDireccion').innerText = 'Direccion: ' ;
-        currentEventTitle = title;
-        //updateSubscriptionStatus();
-        // Send a request to check the subscription status
-        fetch('/check_subscription', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ title: currentEventTitle })
-        })
-        .then(response => response.json())
-        .then(data => {
-            var subscribeButton = document.getElementById('subscribeButton');
-            if (data.status === 'subscribed') {
-                subscribeButton.innerText = 'Suscrito';
-            } else {
-                subscribeButton.innerText = 'Suscribirse';
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
+            const openFormBtn = document.getElementById('open-form-btn');
+            const reservationForm = document.getElementById('reservation-form');
+            openFormBtn.addEventListener('click', () => {
+                reservationForm.style.display = 'block';
+            });
 
-    function updateSubscriptionStatus() {
-        subscribedEvents = JSON.parse(document.getElementById('asistir').value);
-        //subscribedEvents = {{ asistir }}
-        var subscribeButton = document.getElementById('subscribeButton');
-        console.log(subscribedEvents)
-        var isSubscribed = subscribedEvents.includes(currentEventTitle);
-        console.log(subscribedEvents)
-        subscribeButton.innerText = isSubscribed ? 'Suscrito' : 'Suscribirse';
-    }
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.addEventListener('click', () => {
+                const name = document.getElementById('name').value;
+                const lastName = document.getElementById('last_name').value;
+                const identification = document.getElementById('identification').value;
+                const phoneNumber = document.getElementById('phone_number').value;
 
-    document.addEventListener('DOMContentLoaded', function() {
-        updateSubscriptionStatus();
-    });
-
-    function toggleSubscription() {
-        var subscribeButton = document.getElementById('subscribeButton');
-        var subscriptionStatus = document.getElementById('subscriptionStatus');
-        
-        var url = subscribeButton.innerText === 'Suscribirse' ? '/subscribe' : '/unsubscribe';
-        var data = { title: currentEventTitle };
-        
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            if (data.status === 'subscribed') {
-                subscribeButton.innerText = 'Suscrito';
-                subscriptionStatus.value = 'true';
-            } else {
-                subscribeButton.innerText = 'Suscribirse';
-                subscriptionStatus.value = 'false';
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-
-</script>
-
-
-
+                fetch('/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        last_name: lastName,
+                        identification: identification,
+                        phone_number: phoneNumber,
+                        selected_rooms: Array.from(selectedRooms)
+                    })
+                }).then(response => response.json())
+                  .then(data => {
+                      if (data.status === 'success') {
+                          alert('Reserva exitosa');
+                          window.location.reload();
+                      }
+                  });
+            });
+        });
+    </script>
 </body>
 </html>
