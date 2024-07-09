@@ -69,7 +69,7 @@
     <div class="container">
         <div class="room-list" id="room-list">
             {% for room in rooms %}
-                <div class="room-item" data-room-id="{{ room[0] }}">
+                <div class="room-item" data-room-id="{{ room[0] }}" data-room-type="{{ room[1] }}">
                     <p>ID: {{ room[0] }}</p>
                     {% if room[1] == 'Simple' %}
                         <img src="https://d3ahbhsao0me9i.cloudfront.net/cache/img/28e2dc504bbc602a52f991aa650cbf53d95c66a0-28e2dc-1980-1024-auto.jpg" alt="Habitación Simple">
@@ -101,6 +101,14 @@
                 <input type="text" id="identification" name="identification" required><br><br>
                 <label for="phone_number">Número de Teléfono:</label>
                 <input type="tel" id="phone_number" name="phone_number" required><br><br>
+                <label for="card_number">Número de Tarjeta:</label>
+                <input type="text" id="card_number" name="card_number" required><br><br>
+                <label for="start_date">Fecha de Inicio:</label>
+                <input type="text" id="start_date" name="start_date" required><br><br>
+                <label for="end_date">Fecha Final:</label>
+                <input type="text" id="end_date" name="end_date" required><br><br>
+                <label for="numerodepersonas">Numero de Personas:</label>
+                <input type="number" id="numerodepersonas" name="numerodepersonas" required><br><br>
                 <button type="button" id="submit-btn">Enviar</button>
             </form>
         </div>
@@ -137,6 +145,15 @@
                 const lastName = document.getElementById('last_name').value;
                 const identification = document.getElementById('identification').value;
                 const phoneNumber = document.getElementById('phone_number').value;
+                const cardNumber = document.getElementById('card_number').value;
+                const startDate = document.getElementById('start_date').value;
+                const endDate = document.getElementById('end_date').value;
+                const numerodepersonas = document.getElementById('numerodepersonas').value;
+
+                const selectedRoomDetails = Array.from(selectedRooms).map(roomId => {
+                    const roomItem = document.querySelector(`.room-item[data-room-id='${roomId}']`);
+                    return {idd: roomId, type: roomItem.getAttribute('data-room-type')};
+                });
 
                 fetch('/submit', {
                     method: 'POST',
@@ -148,12 +165,17 @@
                         last_name: lastName,
                         identification: identification,
                         phone_number: phoneNumber,
-                        selected_rooms: Array.from(selectedRooms)
+                        card_number: cardNumber,
+                        start_date: startDate,
+                        end_date: endDate,
+                        numeropersonas: numerodepersonas,
+                        selected_rooms: selectedRoomDetails
                     })
                 }).then(response => response.json())
                   .then(data => {
                       if (data.status === 'success') {
-                          alert('Reserva exitosa');
+                          let roomTypes = selectedRoomDetails.map(room => room.type).join(', ');
+                          alert(`Reserva exitosa. Se han reservado ${selectedRoomDetails.length} habitaciones: ${roomTypes}`);
                           window.location.reload();
                       }
                   });
