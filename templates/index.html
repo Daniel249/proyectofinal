@@ -7,6 +7,11 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 0; /* Asegura que no haya margen en el cuerpo */
+            padding-bottom: 50px; /* Espacio para el botón fijo */
+            min-height: 100vh; /* Mínimo de altura para cubrir la pantalla */
+            display: flex;
+            flex-direction: column;
         }
         h1 {
             text-align: center;
@@ -18,6 +23,7 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             background-color: #f9f9f9;
+            flex: 1; /* Ocupa todo el espacio disponible */
         }
         .room-list {
             display: flex;
@@ -51,15 +57,20 @@
             border-radius: 8px;
             background-color: #fff;
         }
-        button {
+        button#open-form-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
             background-color: #007bff;
             color: white;
             cursor: pointer;
+            z-index: 999; /* Asegura que esté sobre otros elementos */
         }
-        button:hover {
+        button#open-form-btn:hover {
             background-color: #0056b3;
         }
     </style>
@@ -67,27 +78,15 @@
 <body>
     <h1>Reserve sus habitaciones</h1>
     <div class="container">
-        <div class="room-list" id="room-list">
-            {% for room in rooms %}
-                <div class="room-item" data-room-id="{{ room[0] }}" data-room-type="{{ room[1] }}">
-                    <p>ID: {{ room[0] }}</p>
-                    {% if room[1] == 'Simple' %}
-                        <img src="https://d3ahbhsao0me9i.cloudfront.net/cache/img/28e2dc504bbc602a52f991aa650cbf53d95c66a0-28e2dc-1980-1024-auto.jpg" alt="Habitación Simple">
-                    {% elif room[1] == 'Doble' %}
-                        <img src="https://www.zaanhotel.com/images/rooms/deluxe-double/gallery/Double%206.jpg" alt="Habitación Doble">
-                    {% elif room[2] == 2 %}
-                        <img src="https://previews.123rf.com/images/rilueda/rilueda1701/rilueda170100289/70732373-interior-de-un-nuevo-dormitorio-cama-doble-hotel-en-el-%C3%A1tico.jpg" alt="Habitación Doble con 2 Camas">
-                    {% elif room[2] == 3 %}
-                        <img src="https://media-cdn.tripadvisor.com/media/photo-s/0f/03/3c/9d/habitacion-triple-3-camas.jpg" alt="Habitación Triple">
-                    {% elif room[2] == 4 %}
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_J8zqWyg_LealhdCbHn4zlEPV6VkI7jvO8g&s" alt="Habitación Cuádruple">
-                    {% endif %}
-                    <h2>Tipo: {{ room[1] }}</h2>
-                    <p>Cantidad de camas: {{ room[2] }}</p>
-                </div>
-            {% endfor %}
+        <div id="date-form">
+            <label for="start_date">Fecha de Inicio:</label>
+            <input type="date" id="start_date" name="start_date" required><br><br>
+            <label for="end_date">Fecha Final:</label>
+            <input type="date" id="end_date" name="end_date" required><br><br>
+            <button id="fetch-rooms-btn">Buscar Habitaciones</button>
         </div>
-        <button id="open-form-btn">Reservar</button>
+
+        <div class="room-list" id="room-list"></div>
 
         <!-- Formulario de reserva -->
         <div id="reservation-form">
@@ -103,10 +102,6 @@
                 <input type="tel" id="phone_number" name="phone_number" required><br><br>
                 <label for="card_number">Número de Tarjeta:</label>
                 <input type="text" id="card_number" name="card_number" required><br><br>
-                <label for="start_date">Fecha de Inicio:</label>
-                <input type="text" id="start_date" name="start_date" required><br><br>
-                <label for="end_date">Fecha Final:</label>
-                <input type="text" id="end_date" name="end_date" required><br><br>
                 <label for="numerodepersonas">Numero de Personas:</label>
                 <input type="number" id="numerodepersonas" name="numerodepersonas" required><br><br>
                 <button type="button" id="submit-btn">Enviar</button>
@@ -114,10 +109,53 @@
         </div>
     </div>
 
+    <button id="open-form-btn">Reservar</button>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const fetchRoomsBtn = document.getElementById('fetch-rooms-btn');
             const roomList = document.getElementById('room-list');
+            const openFormBtn = document.getElementById('open-form-btn');
+            const reservationForm = document.getElementById('reservation-form');
             const selectedRooms = new Set();
+
+            fetchRoomsBtn.addEventListener('click', () => {
+                const startDate = document.getElementById('start_date').value;
+                const endDate = document.getElementById('end_date').value;
+
+                fetch('/fetch_rooms', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ start_date: startDate, end_date: endDate })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    roomList.innerHTML = '';
+                    data.forEach(room => {
+                        const roomItem = document.createElement('div');
+                        roomItem.classList.add('room-item');
+                        roomItem.setAttribute('data-room-id', room[0]);
+                        roomItem.setAttribute('data-room-type', room[1]);
+                        
+                        roomItem.innerHTML = `
+                            <p>ID: ${room[0]}</p>
+                            ${room[1] === 'Simple' ? '<img src="https://d3ahbhsao0me9i.cloudfront.net/cache/img/28e2dc504bbc602a52f991aa650cbf53d95c66a0-28e2dc-1980-1024-auto.jpg" alt="Habitación Simple">' : ''}
+                            ${room[1] === 'Doble' ? '<img src="https://www.zaanhotel.com/images/rooms/deluxe-double/gallery/Double%206.jpg" alt="Habitación Doble">' : ''}
+                            ${room[2] === 2 ? '<img src="https://previews.123rf.com/images/rilueda/rilueda1701/rilueda170100289/70732373-interior-de-un-nuevo-dormitorio-cama-doble-hotel-en-el-%C3%A1tico.jpg" alt="Habitación Doble con 2 Camas">' : ''}
+                            ${room[2] === 3 ? '<img src="https://media-cdn.tripadvisor.com/media/photo-s/0f/03/3c/9d/habitacion-triple-3-camas.jpg" alt="Habitación Triple">' : ''}
+                            ${room[2] === 4 ? '<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_J8zqWyg_LealhdCbHn4zlEPV6VkI7jvO8g&s" alt="Habitación Cuádruple">' : ''}
+                            <h2>Tipo: ${room[1]}</h2>
+                            <p>Cantidad de camas: ${room[2]}</p>
+                        `;
+                        roomList.appendChild(roomItem);
+                    });
+
+                    roomList.style.display = 'flex';
+                    openFormBtn.style.display = 'block';
+                });
+            });
 
             roomList.addEventListener('click', (e) => {
                 const roomItem = e.target.closest('.room-item');
@@ -133,8 +171,6 @@
                 }
             });
 
-            const openFormBtn = document.getElementById('open-form-btn');
-            const reservationForm = document.getElementById('reservation-form');
             openFormBtn.addEventListener('click', () => {
                 reservationForm.style.display = 'block';
             });
@@ -146,13 +182,13 @@
                 const identification = document.getElementById('identification').value;
                 const phoneNumber = document.getElementById('phone_number').value;
                 const cardNumber = document.getElementById('card_number').value;
+                const numerodepersonas = document.getElementById('numerodepersonas').value;
                 const startDate = document.getElementById('start_date').value;
                 const endDate = document.getElementById('end_date').value;
-                const numerodepersonas = document.getElementById('numerodepersonas').value;
 
                 const selectedRoomDetails = Array.from(selectedRooms).map(roomId => {
                     const roomItem = document.querySelector(`.room-item[data-room-id='${roomId}']`);
-                    return {idd: roomId, type: roomItem.getAttribute('data-room-type')};
+                    return { idd: roomId, type: roomItem.getAttribute('data-room-type') };
                 });
 
                 fetch('/submit', {
@@ -172,13 +208,13 @@
                         selected_rooms: selectedRoomDetails
                     })
                 }).then(response => response.json())
-                  .then(data => {
-                      if (data.status === 'success') {
-                          let roomTypes = selectedRoomDetails.map(room => room.type).join(', ');
-                          alert(`Reserva exitosa. Se han reservado ${selectedRoomDetails.length} habitaciones: ${roomTypes}`);
-                          window.location.reload();
-                      }
-                  });
+                .then(data => {
+                    if (data.status === 'success') {
+                        let roomTypes = selectedRoomDetails.map(room => room.type).join(', ');
+                        alert(`Reserva exitosa. Se han reservado ${selectedRoomDetails.length} habitaciones: ${roomTypes}`);
+                        window.location.reload();
+                    }
+                });
             });
         });
     </script>
